@@ -14,6 +14,11 @@
             <version>4.0.36.Final</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
+            <version>0.10.0</version>
+        </dependency>
     </dependencies>
 
 </project>
