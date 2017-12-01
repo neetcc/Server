@@ -20,13 +20,7 @@ import java.io.InputStreamReader;
 public class Client {
     public static String host = "127.0.0.1";
     public static int port = 7878;
-
-    /**
-     * @param args
-     * @throws InterruptedException
-     * @throws IOException
-     */
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public void starClinet()  throws InterruptedException, IOException{
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
@@ -38,13 +32,13 @@ public class Client {
             Channel ch = b.connect(host, port).sync().channel();
             ConnectionObject CO = new ConnectionObject();
             CO.setChannel(ch);
-            MsgHandlerLoader.loadHandler();
-          for(int i = 0;i<100;i++){
-              CSPingMsg msg = new CSPingMsg();
-              msg.setCharId(i);
-              CO.sendMessage(msg); // not sure that this object is already sent , cause main thread is shutdown
-          }
-         Thread.currentThread().sleep(1500);
+           // MsgHandlerLoader.loadHandler();
+            for(int i = 0;i<100;i++){
+                CSPingMsg msg = new CSPingMsg();
+                msg.setCharId(i);
+                CO.sendMessage(msg); // not sure that this object is already sent , cause main thread is shutdown
+            }
+            Thread.currentThread().sleep(1500);
         } finally {
             // The connection is closed automatically on shutdown.
             group.shutdownGracefully();

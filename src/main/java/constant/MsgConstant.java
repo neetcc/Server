@@ -1,11 +1,5 @@
 package constant;
 
-import msg.CS.CSPingMsg;
-import msg.CSPingHandler;
-import msg.IMessageHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by ChengCe on 2017/12/1.

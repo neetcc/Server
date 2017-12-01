@@ -1,14 +1,13 @@
 package server;
 
+import Connection.ConnectionObject;
 import constant.MsgHandlerLoader;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import msg.CS.CSPingMsg;
-import msg.IMessage;
 import msg.IMessageHandler;
 import msg.ThriftMsg;
 
-import java.net.InetAddress;
 
 /**
  * Created by ChengCe on 2017/12/1.
@@ -17,13 +16,18 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ThriftMsg  msgs = (ThriftMsg)msg; 
-        MsgHandlerLoader.loadHandler();
+        ThriftMsg  msgs = (ThriftMsg)msg;
         IMessageHandler iMessageHandler = MsgHandlerLoader.getMsgHandler(msgs.getMessageId());
         iMessageHandler.execute(msgs);
-        //CSPingMsg ms = (CSPingMsg) msgs.getMessage();
-       // System.out.println(ctx.channel().remoteAddress() + " Say : " + ms.getCharId());
-        ctx.writeAndFlush("Received your message !\n");
+        ConnectionObject CO = new ConnectionObject();
+        CO.setChannel(ctx.channel());
+        // MsgHandlerLoader.loadHandler();
+        for(int i = 100;i<200;i++){
+            CSPingMsg msgss = new CSPingMsg();
+            msgss.setCharId(i);
+            CO.sendMessage(msgss); // not sure that this object is already sent , cause main thread is shutdown
+        }
+       // ctx.writeAndFlush("Received your message !\n");
     }
 
     /*

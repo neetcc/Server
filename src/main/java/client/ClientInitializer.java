@@ -5,6 +5,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.codec.string.StringDecoder;
@@ -25,10 +26,11 @@ public class ClientInitializer extends ChannelInitializer<SocketChannel> {
          * 解码和编码 我将会在下一张为大家详细的讲解。再次暂时不做详细的描述
          * 
          * */
+        pipeline.addLast("decode",new ObjectDecoder(ClassResolvers.cacheDisabled(this.getClass().getClassLoader())));
           pipeline.addLast("Encode", new ObjectEncoder());
        // pipeline.addLast("decoder", new StringDecoder());
       //  pipeline.addLast("encoder", new StringEncoder());
-
+            
         // 客户端的逻辑
         pipeline.addLast("handler", new ClientHandler());
     }

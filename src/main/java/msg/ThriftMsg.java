@@ -9,6 +9,7 @@ import org.apache.thrift.TBase;
 public class ThriftMsg implements IMessage ,java.io.Serializable{
     private TBase<?, ?> message;
     private int messageId;
+    private Sender sender;
     @Override
     public int getMessageId() {
         return messageId;
@@ -17,7 +18,9 @@ public class ThriftMsg implements IMessage ,java.io.Serializable{
     public void setMessageId(int messageId){
         this.messageId = messageId;
     }
-    
+    public void setSender(Sender sender){
+        this.sender = sender;
+    }
     @Override
     public Sender getSender() {
         return null;
