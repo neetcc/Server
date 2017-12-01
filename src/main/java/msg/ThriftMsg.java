@@ -6,7 +6,7 @@ import org.apache.thrift.TBase;
 /**
  * Created by ChengCe on 2017/12/1.
  */
-public class ThriftMsg implements IMessage{
+public class ThriftMsg implements IMessage ,java.io.Serializable{
     private TBase<?, ?> message;
     @Override
     public int getMessageId() {

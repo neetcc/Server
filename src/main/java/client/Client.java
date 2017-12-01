@@ -34,26 +34,14 @@ public class Client {
 
             // 连接服务端
             Channel ch = b.connect(host, port).sync().channel();
-            CSPingMsg msg = new CSPingMsg();
-            msg.setCharId(1);
-            int i =0 ;
-            // 控制台输入
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            for (;;) {
-                String line = in.readLine();
-                if (line == null) {
-                    continue;
-                }
-                msg.setCharId(i++);
-                ThriftMsg ms = new ThriftMsg(msg);
-                ch.writeAndFlush(msg);
-                /*
-                 * 向服务端发送在控制台输入的文本 并用"\r\n"结尾
-                 * 之所以用\r\n结尾 是因为我们在handler中添加了 DelimiterBasedFrameDecoder 帧解码。
-                 * 这个解码器是一个根据\n符号位分隔符的解码器。所以每条消息的最后必须加上\n否则无法识别和解码
-                 * */
-              //  ch.writeAndFlush(line + "\r\n");
-            }
+            
+          for(int i = 0;i<100;i++){
+              CSPingMsg msg = new CSPingMsg();
+              msg.setCharId(i);
+              ThriftMsg ms = new ThriftMsg(msg);
+              ch.writeAndFlush(ms); // not sure that this object is already sent , cause main thread is shutdown
+          }
+         
         } finally {
             // The connection is closed automatically on shutdown.
             group.shutdownGracefully();

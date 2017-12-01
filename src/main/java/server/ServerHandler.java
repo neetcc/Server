@@ -14,12 +14,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-       
-        CSPingMsg ms = (CSPingMsg)msg;
-        // 收到消息直接打印输出
-        System.out.println(ctx.channel().remoteAddress() + "  input id : " + ms.getCharId());
-
-        // 返回客户端消息 - 我已经接收到了你的消息
+        ThriftMsg  msgs = (ThriftMsg)msg; 
+        CSPingMsg ms = (CSPingMsg) msgs.getMessage();
+        System.out.println(ctx.channel().remoteAddress() + " Say : " + ms.getCharId());
         ctx.writeAndFlush("Received your message !\n");
     }
 
@@ -34,7 +31,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 
         System.out.println("RamoteAddress : " + ctx.channel().remoteAddress() + " active !");
 
-        ctx.writeAndFlush( "Welcome to " + InetAddress.getLocalHost().getHostName() + " service!\n");
+       // ctx.writeAndFlush( "Welcome to " + InetAddress.getLocalHost().getHostName() + " service!\n");
 
         super.channelActive(ctx);
     }
