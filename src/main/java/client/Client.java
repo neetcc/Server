@@ -1,5 +1,7 @@
 package client;
 
+import Connection.ConnectionObject;
+import constant.MsgHandlerLoader;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -34,14 +36,15 @@ public class Client {
 
             // 连接服务端
             Channel ch = b.connect(host, port).sync().channel();
-            
+            ConnectionObject CO = new ConnectionObject();
+            CO.setChannel(ch);
+            MsgHandlerLoader.loadHandler();
           for(int i = 0;i<100;i++){
               CSPingMsg msg = new CSPingMsg();
               msg.setCharId(i);
-              ThriftMsg ms = new ThriftMsg(msg);
-              ch.writeAndFlush(ms); // not sure that this object is already sent , cause main thread is shutdown
+              CO.sendMessage(msg); // not sure that this object is already sent , cause main thread is shutdown
           }
-         
+         Thread.currentThread().sleep(1500);
         } finally {
             // The connection is closed automatically on shutdown.
             group.shutdownGracefully();

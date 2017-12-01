@@ -1,6 +1,8 @@
 package Connection;
 
 import Util.IpUtil;
+import constant.MsgConstant;
+import constant.MsgHandlerLoader;
 import io.netty.channel.Channel;
 import msg.ThriftMsg;
 import org.apache.thrift.TBase;
@@ -39,6 +41,7 @@ public class ConnectionObject implements Sender {
     public void sendMessage(TBase<?, ?> message) {
         if (this.isConnected()) {
             ThriftMsg packet = new ThriftMsg(message);
+            packet.setMessageId(MsgHandlerLoader.getMsgId(message.getClass()));
             this.channel.writeAndFlush(packet);
         }
     }

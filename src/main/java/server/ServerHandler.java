@@ -1,8 +1,11 @@
 package server;
 
+import constant.MsgHandlerLoader;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import msg.CS.CSPingMsg;
+import msg.IMessage;
+import msg.IMessageHandler;
 import msg.ThriftMsg;
 
 import java.net.InetAddress;
@@ -15,8 +18,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         ThriftMsg  msgs = (ThriftMsg)msg; 
-        CSPingMsg ms = (CSPingMsg) msgs.getMessage();
-        System.out.println(ctx.channel().remoteAddress() + " Say : " + ms.getCharId());
+        MsgHandlerLoader.loadHandler();
+        IMessageHandler iMessageHandler = MsgHandlerLoader.getMsgHandler(msgs.getMessageId());
+        iMessageHandler.execute(msgs);
+        //CSPingMsg ms = (CSPingMsg) msgs.getMessage();
+       // System.out.println(ctx.channel().remoteAddress() + " Say : " + ms.getCharId());
         ctx.writeAndFlush("Received your message !\n");
     }
 

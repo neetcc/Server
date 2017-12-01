@@ -8,11 +8,16 @@ import org.apache.thrift.TBase;
  */
 public class ThriftMsg implements IMessage ,java.io.Serializable{
     private TBase<?, ?> message;
+    private int messageId;
     @Override
     public int getMessageId() {
-        return 0;
+        return messageId;
     }
-
+    
+    public void setMessageId(int messageId){
+        this.messageId = messageId;
+    }
+    
     @Override
     public Sender getSender() {
         return null;
