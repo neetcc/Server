@@ -23,7 +23,7 @@ public class ThriftMsg implements IMessage ,java.io.Serializable{
     }
     @Override
     public Sender getSender() {
-        return null;
+        return this.sender;
     }
     public void setMessage(TBase<?, ?> message) {
         this.message = message;

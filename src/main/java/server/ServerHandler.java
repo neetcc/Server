@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import msg.CS.CSPingMsg;
 import msg.IMessageHandler;
+import msg.SC.SCPingMsg;
 import msg.ThriftMsg;
 
 
@@ -17,17 +18,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         ThriftMsg  msgs = (ThriftMsg)msg;
-        IMessageHandler iMessageHandler = MsgHandlerLoader.getMsgHandler(msgs.getMessageId());
-        iMessageHandler.execute(msgs);
         ConnectionObject CO = new ConnectionObject();
         CO.setChannel(ctx.channel());
-        // MsgHandlerLoader.loadHandler();
-        for(int i = 100;i<200;i++){
-            CSPingMsg msgss = new CSPingMsg();
-            msgss.setCharId(i);
-            CO.sendMessage(msgss); // not sure that this object is already sent , cause main thread is shutdown
-        }
-       // ctx.writeAndFlush("Received your message !\n");
+        msgs.setSender(CO);
+        IMessageHandler iMessageHandler = MsgHandlerLoader.getMsgHandler(msgs.getMessageId());
+        iMessageHandler.execute(msgs);
     }
 
     /*

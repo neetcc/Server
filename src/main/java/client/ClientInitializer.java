@@ -27,9 +27,8 @@ public class ClientInitializer extends ChannelInitializer<SocketChannel> {
          * 
          * */
         pipeline.addLast("decode",new ObjectDecoder(ClassResolvers.cacheDisabled(this.getClass().getClassLoader())));
-          pipeline.addLast("Encode", new ObjectEncoder());
-       // pipeline.addLast("decoder", new StringDecoder());
-      //  pipeline.addLast("encoder", new StringEncoder());
+        pipeline.addLast("Encode", new ObjectEncoder());
+
             
         // 客户端的逻辑
         pipeline.addLast("handler", new ClientHandler());

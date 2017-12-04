@@ -1,5 +1,6 @@
 package client;
 
+import Connection.ConnectionObject;
 import constant.MsgHandlerLoader;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -15,6 +16,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         ThriftMsg  msgs = (ThriftMsg)msg;
+        ConnectionObject CO = new ConnectionObject();
+        CO.setChannel(ctx.channel());
+        msgs.setSender(CO);
         IMessageHandler iMessageHandler = MsgHandlerLoader.getMsgHandler(msgs.getMessageId());
         iMessageHandler.execute(msgs);
     }
