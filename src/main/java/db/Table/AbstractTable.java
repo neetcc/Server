@@ -7,6 +7,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSON;
+import db.Entity.User;
 import db.MongoDaoImpl;
 import db.MongoHelper;
 import db.MongoUtil;
@@ -78,5 +79,7 @@ public abstract class AbstractTable<T> {
         MongoCollection<Document> collection = mongoDataBase.getCollection(tableName);
         collection.drop();
     }
+    
+    public abstract void update(T object);
      
 }

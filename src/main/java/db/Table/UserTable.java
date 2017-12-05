@@ -11,4 +11,8 @@ public class UserTable extends AbstractTable<User>{
         this.tableName = DBConstant.COLLECTION_USER;
         this.dbInit();
     }
+    @Override
+    public void update(User user){
+        super.updateById(user.getId(),user);
+    }
 }
