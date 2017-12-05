@@ -5,6 +5,7 @@ import constant.MsgHandlerLoader;
 import db.Table.UserTable;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -28,7 +29,13 @@ public class Server {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup);
-            b.channel(NioServerSocketChannel.class);
+            b.channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_KEEPALIVE,true)
+                    .option(ChannelOption.TCP_NODELAY,true)
+                    .option(ChannelOption.SO_REUSEADDR,true)
+                    .option(ChannelOption.SO_RCVBUF, 1024)
+                    .option(ChannelOption.SO_SNDBUF, 1024)
+                    .option(ChannelOption.SO_BACKLOG,10240);
             b.childHandler(new ServerInitializer());
             // 服务器绑定端口监听
             ChannelFuture f = b.bind(portNumber).sync();
@@ -36,19 +43,8 @@ public class Server {
             MsgHandlerLoader.loadHandler();
             UserTable ut = ServerConfig.ut;
             ut.drop();
+            ServerTest.test();
             
-            Thread td = new Thread(() -> {
-                Client client = new Client();
-                try {
-                    client.starClinet();
-                } catch (InterruptedException e) {
-                    e.printStackTrace( );
-                } catch (IOException e) {
-                    e.printStackTrace( );
-                }
-            });
-            
-           td.start();
             // 监听服务器关闭监听
             f.channel().closeFuture().sync();
             

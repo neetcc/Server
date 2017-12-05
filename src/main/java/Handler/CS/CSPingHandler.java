@@ -24,11 +24,11 @@ public class CSPingHandler extends AbstractMessageHandler<CSPingMsg,Sender> {
             @Override
             protected void execute() {
                 System.out.println(msg.getCharId());
-                ut.insert(new User(msg.getCharId(),String.valueOf(msg.getCharId())));
+              /*  ut.insert(new User(msg.getCharId(),String.valueOf(msg.getCharId())));
                 ConnectionObject CO = (ConnectionObject) sender;
                 SCPingMsg msgss = new SCPingMsg();
                 msgss.setId(msg.getCharId()+100);
-                CO.sendMessage(msgss); // not sure that this object is already sent , cause main thread is shutdown
+                CO.sendMessage(msgss); // not sure that this object is already sent , cause main thread is shutdown*/
             }
 
             @Override
