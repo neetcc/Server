@@ -2,6 +2,7 @@ package Handler.CS;
 
 import Connection.ConnectionObject;
 import Connection.Sender;
+import Handler.HandlerTask;
 import TaskManagement.AbstractSimpleTask;
 import TaskManagement.DefaultTaskManager;
 import constant.MsgConstant;
@@ -18,8 +19,10 @@ import server.ServerConfig;
 public class CSPingHandler extends AbstractMessageHandler<CSPingMsg,Sender> {
     private DefaultTaskManager taskManager = ServerConfig.taskManager;
     private UserTable ut = ServerConfig.ut;
+    private HandlerTask ht =ServerConfig.ht;
     @Override
     protected void doExecute(CSPingMsg msg, Sender sender) {
+        ht.generateUser(sender);
         taskManager.executeITask(new AbstractSimpleTask( ) {
             @Override
             protected void execute() {
