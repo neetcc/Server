@@ -2,6 +2,7 @@ package server;
 
 import client.Client;
 import constant.MsgHandlerLoader;
+import db.Table.UserTable;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -31,7 +32,11 @@ public class Server {
             b.childHandler(new ServerInitializer());
             // 服务器绑定端口监听
             ChannelFuture f = b.bind(portNumber).sync();
+            
             MsgHandlerLoader.loadHandler();
+            UserTable ut = ServerConfig.ut;
+            ut.drop();
+            
             Thread td = new Thread(() -> {
                 Client client = new Client();
                 try {

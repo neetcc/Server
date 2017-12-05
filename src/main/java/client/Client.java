@@ -33,7 +33,7 @@ public class Client {
             ConnectionObject CO = new ConnectionObject();
             CO.setChannel(ch);
            // MsgHandlerLoader.loadHandler();
-            for(int i = 0;i<100;i++){
+            for(int i = 0;i<50;i++){
                 CSPingMsg msg = new CSPingMsg();
                 msg.setCharId(i);
                 CO.sendMessage(msg); // not sure that this object is already sent , cause main thread is shutdown
