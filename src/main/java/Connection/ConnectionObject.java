@@ -1,7 +1,6 @@
 package Connection;
 
 import Util.IpUtil;
-import constant.MsgConstant;
 import constant.MsgHandlerLoader;
 import io.netty.channel.Channel;
 import msg.ThriftMsg;

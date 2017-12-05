@@ -41,7 +41,7 @@ public class MongoDaoImpl implements MongoDao{
         MongoCursor<Document> cursor = iterable.iterator();
         while (cursor.hasNext()) {
             Document user = cursor.next();
-            System.out.println(user.toString());
+           // System.out.println(user.toString());
         }
 
     }
@@ -56,7 +56,7 @@ public class MongoDaoImpl implements MongoDao{
         MongoCursor<Document> cursor = iterable.iterator();
         while (cursor.hasNext()) {
             Document user = cursor.next();
-            System.out.println(user.toString());
+          //  System.out.println(user.toString());
         }
     }
 
@@ -75,7 +75,7 @@ public class MongoDaoImpl implements MongoDao{
         MongoCursor<Document> cursor = iterable.iterator();
         while (cursor.hasNext()) {
             Document user = cursor.next();
-            System.out.println(user.toString());
+           // System.out.println(user.toString());
         }
     }
 
