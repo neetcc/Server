@@ -9,6 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import msg.CS.CSPingMsg;
 import msg.ThriftMsg;
+import server.ServerConfig;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,8 +19,8 @@ import java.io.InputStreamReader;
  * Created by ChengCe on 2017/12/1.
  */
 public class Client {
-    public static String host = "127.0.0.1";
-    public static int port = 7878;
+    public static String host = ServerConfig.IP;
+    public static int port = ServerConfig.PORT;
     public void starClinet()  throws InterruptedException, IOException{
         EventLoopGroup group = new NioEventLoopGroup();
         try {
