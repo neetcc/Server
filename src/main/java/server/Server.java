@@ -20,7 +20,7 @@ public class Server {
     /**
      * 服务端监听的端口地址
      */
-    private static final int portNumber = 7878;
+    private static final int portNumber = ServerConfig.PORT;
 
     public static void main(String[] args) throws InterruptedException{
         EventLoopGroup bossGroup = new NioEventLoopGroup();

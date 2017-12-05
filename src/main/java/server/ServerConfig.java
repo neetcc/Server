@@ -9,4 +9,6 @@ import db.Table.UserTable;
 public class ServerConfig {
     public static final DefaultTaskManager taskManager = new DefaultTaskManager();
     public static final UserTable ut = new UserTable();
+    public static final String IP = "127.0.0.1";
+    public static final int PORT = 7878;
 }
