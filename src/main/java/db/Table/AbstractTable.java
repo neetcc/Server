@@ -38,7 +38,7 @@ public abstract class AbstractTable<T> {
          gson = new Gson();
     }
     
-    public Class<T> getclass(){
+    public Class getclass(){
         Class<T>  entityClass = (Class<T>)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         return entityClass;
     }

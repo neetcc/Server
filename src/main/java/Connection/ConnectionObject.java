@@ -21,7 +21,11 @@ public class ConnectionObject implements Sender {
     public void setChannel(Channel channel) {
         this.channel = channel;
     }
-    
+
+    public Channel getChannel() {
+        return channel;
+    }
+
     public String getIp() {
         return IpUtil.getChannelIp(channel);
     }

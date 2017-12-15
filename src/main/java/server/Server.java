@@ -22,7 +22,7 @@ public class Server {
      */
     private static final int portNumber = ServerConfig.PORT;
 
-    public static void main(String[] args) throws InterruptedException{
+    public static void main(String[] args) throws InterruptedException, IOException {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -34,21 +34,9 @@ public class Server {
             ChannelFuture f = b.bind(portNumber).sync();
             
             MsgHandlerLoader.loadHandler();
-            UserTable ut = ServerConfig.ut;
-            ut.drop();
+            ServerTest.test();
             
-            Thread td = new Thread(() -> {
-                Client client = new Client();
-                try {
-                    client.starClinet();
-                } catch (InterruptedException e) {
-                    e.printStackTrace( );
-                } catch (IOException e) {
-                    e.printStackTrace( );
-                }
-            });
             
-           td.start();
             // 监听服务器关闭监听
             f.channel().closeFuture().sync();
             

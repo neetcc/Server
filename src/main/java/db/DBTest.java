@@ -8,6 +8,7 @@ import db.Entity.User;
 import db.Table.UserTable;
 import org.bson.Document;
 
+import java.nio.ByteBuffer;
 import java.util.Set;
 
 /**
@@ -15,22 +16,28 @@ import java.util.Set;
  */
 public class DBTest {
     public static void main(String[] args) throws InterruptedException {
-      UserTable ut = new UserTable();
-      ut.drop();
-      ut.insert(new User(1,"first"));
-      ut.insert(new User(2,"second"));
-      ut.insert(new User(3,"third"));
-      Thread.currentThread().sleep(15000);
-      Set<User> u = ut.queryByID(1);
-      for(User ser :u){
-          System.out.println(ser.getName());
-      }
-        Thread.currentThread().sleep(15000);
-      ut.deleteById(1);
-        Thread.currentThread().sleep(15000);
-        ut.delete(new User(2,"second"));
-        Thread.currentThread().sleep(15000);
-        ut.updateById(3,new User(3,"three"));
+//      UserTable ut = new UserTable();
+//      byte[] bytes = new byte[5];
+//      for(int i = 0; i<bytes.length;i++){
+//        bytes[i] = Byte.valueOf(String.valueOf(i));
+//      }
+//      ut.drop();
+//      ut.insert(new User(1,"first"));
+//      ut.insert(new User(2,"second"));
+//      ut.insert(new User(3,"third"));
+//      
+//      Thread.currentThread().sleep(15000);
+//      Set<User> u = ut.queryByID(1);
+//      for(User ser :u){
+//          System.out.println(ser.getName());
+//          System.out.println(ser.bytes);
+//      }
+//        Thread.currentThread().sleep(15000);
+//      ut.deleteById(1);
+//        Thread.currentThread().sleep(15000);
+//        ut.delete(new User(2,"second"));
+//        Thread.currentThread().sleep(15000);
+//        ut.updateById(3,new User(3,"three"));
 
 
     }

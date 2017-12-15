@@ -9,12 +9,15 @@ import msg.IMessageHandler;
 import msg.SC.SCPingMsg;
 import msg.ThriftMsg;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Created by ChengCe on 2017/12/1.
  */
 public class ServerHandler extends SimpleChannelInboundHandler<Object> {
-
+  
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         ThriftMsg  msgs = (ThriftMsg)msg;
@@ -35,9 +38,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
         System.out.println("RamoteAddress : " + ctx.channel().remoteAddress() + " active !");
-
+        
        // ctx.writeAndFlush( "Welcome to " + InetAddress.getLocalHost().getHostName() + " service!\n");
 
         super.channelActive(ctx);
     }
+    
+    
 }

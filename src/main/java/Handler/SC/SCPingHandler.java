@@ -23,8 +23,8 @@ public class SCPingHandler extends AbstractMessageHandler<SCPingMsg, Sender> {
         taskManager.executeITask(new AbstractSimpleTask( ) {
             @Override
             protected void execute() {
-                System.out.println(msg.getId());
-                ut.insert(new User(msg.getId(),String.valueOf(msg.getId())));
+                System.out.println(msg.getId() + " send to " + ((ConnectionObject)sender).getChannel().remoteAddress());
+                //ut.insert(new User(msg.getId(),String.valueOf(msg.getId())));
             }
 
             @Override
