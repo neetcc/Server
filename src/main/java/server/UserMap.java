@@ -1,7 +1,7 @@
 package server;
 
 import Connection.ConnectionObject;
-import client.Addr;
+import client.Address;
 import client.Client;
 import org.apache.commons.collections.map.HashedMap;
 
@@ -13,14 +13,14 @@ import java.util.Map;
  * Created by ChengCe on 2017/12/15.
  */
 public class UserMap {
-    private static Map<Long, ConnectionObject> UserMap = new HashMap<>();
-    private static Map<Addr, Client> userMap = new HashedMap();
-    private static Map<Long, Long> UserLastLog = new HashMap<>();
-    private static Map<Long, Addr> UserAddr = new HashedMap();
-    public static void addUserAddr(long Id, Addr addr){
-        UserAddr.put(Id, addr);
+    private static Map<Long, ConnectionObject> UserMap = new HashMap<>(); // id -- co
+    private static Map<Address, Client> userMap = new HashedMap(); // address -- client
+    private static Map<Long, Long> UserLastLog = new HashMap<>();// last time user ping the server
+    private static Map<Long, Address> UserAddr = new HashedMap(); // id -- address
+    public static void addUserAddr(long Id, Address address){
+        UserAddr.put(Id, address);
     }
-    public static Addr getUserAddr(long id){
+    public static Address getUserAddr(long id){
         if(UserAddr.containsKey(id)){
             return UserAddr.get(id);
         }else{
@@ -31,11 +31,11 @@ public class UserMap {
         UserMap.put(id, Co);
         UserLastLog.put(id, System.currentTimeMillis());
     }
-    public static void addAddr(Addr addr, Client client){
-        userMap.put(addr,client);
+    public static void addAddr(Address address, Client client){
+        userMap.put(address,client);
     }
-    public static Client getClient(Addr addr){
-        return userMap.get(addr);
+    public static Client getClient(Address address){
+        return userMap.get(address);
     }
     public static SocketAddress getUserClient(long id){
         if(UserMap.containsKey(id)){

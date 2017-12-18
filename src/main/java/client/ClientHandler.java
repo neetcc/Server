@@ -20,7 +20,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Object> {
         ThriftMsg  msgs = (ThriftMsg)msg;
         ConnectionObject CO = new ConnectionObject();
         CO.setChannel(ctx.channel());
-        msgs.setSender(CO);
+        msgs.setSender(CO); // Add channel info to the msg to be processed by the handler
         IMessageHandler iMessageHandler = MsgHandlerLoader.getMsgHandler(msgs.getMessageId());
         iMessageHandler.execute(msgs);
     }

@@ -1,7 +1,6 @@
 package client;
 
 import Connection.ConnectionObject;
-import com.sun.org.apache.regexp.internal.RE;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -29,36 +28,42 @@ import java.util.concurrent.TimeUnit;
  * Created by ChengCe on 2017/12/1.
  */
 public class Client {
-    private Addr serverAddress = new Addr(ServerConfig.IP, ServerConfig.PORT);
-    private Channel chToServer;
-    private ConnectionObject coToServer;
-    private Addr myAddress;
-    private int listenPort;
-    private String localhost = "127.0.0.1";
+    private Address serverAddress = new Address(ServerConfig.IP, ServerConfig.PORT);
+    
+    private ConnectionObject coToServer; // the ConnectionObject with a channel connect to the server
+    
+    private Address myAddress; // not contain the listen port
+    
+    private int listenPort; // listen port of the ServerBootstrap
+    
+    private String localhost = "127.0.0.1"; 
+    
+    private Map<Address, ConnectionObject> coMap = new HashedMap(); // address ---- other co
+    
+    private Map<Long, Address> addrMap = new HashedMap(); // other id ---- other address
+    
     public void setLocalhost(String localhost){
         this.localhost = localhost;
     }
     public String getLocalhost(){
         return  this.localhost;
     }
-    private Map<Addr, ConnectionObject> coMap = new HashedMap();
-    private Map<Long, Addr> addrMap = new HashedMap();
-    public void addOtherAddr(Long id, Addr addr){
-        addrMap.put(id, addr);
+    public void addOtherAddr(Long id, Address address){
+        addrMap.put(id, address);
     }
-    public Addr getOtherAddr(Long id){
+    public Address getOtherAddr(Long id){
         if(addrMap.containsKey(id)){
             return addrMap.get(id);
         }else{
             return  null;
         }
     }
-    public void addOtherCO(Addr addr, ConnectionObject CO){
-        coMap.put(addr,CO);
+    public void addOtherCO(Address address, ConnectionObject CO){
+        coMap.put(address,CO);
     }
-    public ConnectionObject getOtherCO(Addr addr){
-        if(coMap.containsKey(addr)){
-            return coMap.get(addr);
+    public ConnectionObject getOtherCO(Address address){
+        if(coMap.containsKey(address)){
+            return coMap.get(address);
         }else{
             return null;
         }
@@ -103,11 +108,11 @@ public class Client {
             if(future.isSuccess()){
                 ch = future.channel();
                 InetSocketAddress  address = (InetSocketAddress)ch.localAddress();
-                myAddress  = new Addr(address.getHostString(),address.getPort());
+                myAddress  = new Address(address.getHostString(),address.getPort());
                 UserMap.addAddr(myAddress,this);
-                chToServer =ch;
                 coToServer = new ConnectionObject();
                 coToServer.setChannel(ch);
+                // report to the server my listen port
                 reportPort();
             }
             startPing();
@@ -133,7 +138,7 @@ public class Client {
         bootstrap.option(ChannelOption.SO_REUSEADDR, true);
         try {
             ChannelFuture cf = bootstrap.bind(localhost,listenPort).sync();
-            UserMap.addAddr(new Addr(localhost,listenPort),this);
+            UserMap.addAddr(new Address(localhost,listenPort),this);
             cf.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace( );
@@ -143,9 +148,9 @@ public class Client {
     public  ConnectionObject connet(long id, String Ip, int port){
         SocketAddress sa = new InetSocketAddress(Ip,port);
         Channel channel = null ;
-        Addr addr = new Addr(Ip,port);
-        if(coMap.containsKey(addr)){
-             return coMap.get(addr);
+        Address address = new Address(Ip,port);
+        if(coMap.containsKey(address)){
+             return coMap.get(address);
         }
         try {
             ChannelFuture future = b.connect(sa).sync();
@@ -160,8 +165,8 @@ public class Client {
         co.setChannel(channel);
         CCPingMsg ccPingMsg = new CCPingMsg();
         co.sendMessage(ccPingMsg);
-        coMap.put(addr,co);
-        addrMap.put(id, addr);
+        coMap.put(address,co);
+        addrMap.put(id, address);
         return co;
     }
     
@@ -174,6 +179,8 @@ public class Client {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(runnable,0,5, TimeUnit.SECONDS);
     }
+    
+    // report to the server my listen port
     public void reportPort(){
         CSPortReportMsg msg = new CSPortReportMsg(this.id,this.localhost,this.listenPort);
         coToServer.sendMessage(msg);

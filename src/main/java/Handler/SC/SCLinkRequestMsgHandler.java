@@ -2,10 +2,9 @@ package Handler.SC;
 
 import Connection.ConnectionObject;
 import Connection.Sender;
-import client.Addr;
+import client.Address;
 import constant.MsgConstant;
 import msg.AbstractMessageHandler;
-import msg.CC.CCPingMsg;
 import msg.SC.SCLinkRequestMsg;
 import server.UserMap;
 
@@ -20,10 +19,10 @@ public class SCLinkRequestMsgHandler extends AbstractMessageHandler<SCLinkReques
        
        ConnectionObject player = ((ConnectionObject)sender);
        InetSocketAddress address = (InetSocketAddress) player.getChannel().localAddress();
-       Addr myAddr = new Addr(address.getHostString(),address.getPort());
+       Address myAddress = new Address(address.getHostString(),address.getPort());
        //ConnectionObject co = 
-               UserMap.getClient(myAddr).connet(msg.getOtherId(),msg.getIp(),msg.getPort());
-       System.out.println(UserMap.getClient(myAddr).getId() + " is connecting to :" + msg.getIp() +" : " + msg.getPort());
+               UserMap.getClient(myAddress).connet(msg.getOtherId(),msg.getIp(),msg.getPort());
+       System.out.println(UserMap.getClient(myAddress).getId() + " is connecting to :" + msg.getIp() +" : " + msg.getPort());
     }
 
     @Override
