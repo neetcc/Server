@@ -2,12 +2,14 @@ package Handler.SC;
 
 import Connection.ConnectionObject;
 import Connection.Sender;
-import client.Client;
+import client.Addr;
 import constant.MsgConstant;
 import msg.AbstractMessageHandler;
+import msg.CC.CCPingMsg;
 import msg.SC.SCLinkRequestMsg;
-import msg.SC.SCPingMsg;
 import server.UserMap;
+
+import java.net.InetSocketAddress;
 
 /**
  * Created by ChengCe on 2017/12/15.
@@ -15,11 +17,13 @@ import server.UserMap;
 public class SCLinkRequestMsgHandler extends AbstractMessageHandler<SCLinkRequestMsg, Sender>{
     @Override
     protected void doExecute(SCLinkRequestMsg msg, Sender sender) {
-       ConnectionObject co = UserMap.getClient(1).connet(msg.getIp(),Integer.valueOf(msg.getPort()));
-        SCPingMsg SCmsg= new SCPingMsg();
-        SCmsg.setId(1);
-        co.sendMessage(SCmsg);
-        
+       
+       ConnectionObject player = ((ConnectionObject)sender);
+       InetSocketAddress address = (InetSocketAddress) player.getChannel().localAddress();
+       Addr myAddr = new Addr(address.getHostString(),address.getPort());
+       //ConnectionObject co = 
+               UserMap.getClient(myAddr).connet(msg.getOtherId(),msg.getIp(),msg.getPort());
+       System.out.println(UserMap.getClient(myAddr).getId() + " is connecting to :" + msg.getIp() +" : " + msg.getPort());
     }
 
     @Override

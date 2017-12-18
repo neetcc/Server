@@ -28,6 +28,7 @@ public class CSPingHandler extends AbstractMessageHandler<CSPingMsg,Sender> {
         taskManager.executeITask(new AbstractSimpleTask( ) {
             @Override
             protected void execute() {
+                System.out.print("get ping msg from : ");
                 System.out.println(msg.getCharId());
                 //ut.insert(new User(msg.getCharId(),String.valueOf(msg.getCharId())));
                 ConnectionObject CO = (ConnectionObject) sender;

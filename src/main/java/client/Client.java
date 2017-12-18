@@ -1,7 +1,7 @@
 package client;
 
 import Connection.ConnectionObject;
-import constant.MsgHandlerLoader;
+import com.sun.org.apache.regexp.internal.RE;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -9,20 +9,18 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import msg.CC.CCPingMsg;
 import msg.CS.CSPingMsg;
-import msg.SC.SCPingMsg;
-import msg.ThriftMsg;
+import msg.CS.CSPortReportMsg;
+import org.apache.commons.collections.map.HashedMap;
 import server.ServerConfig;
-import server.ServerInitializer;
+import server.UserMap;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,94 +29,159 @@ import java.util.concurrent.TimeUnit;
  * Created by ChengCe on 2017/12/1.
  */
 public class Client {
-    public  String host = ServerConfig.IP;
-    public  int port = ServerConfig.PORT;
-    public Channel chToServer;
-    public ConnectionObject coToServer;
-    public SocketAddress myport;
-    public int liport;
-    Bootstrap b;
+    private Addr serverAddress = new Addr(ServerConfig.IP, ServerConfig.PORT);
+    private Channel chToServer;
+    private ConnectionObject coToServer;
+    private Addr myAddress;
+    private int listenPort;
+    private String localhost = "127.0.0.1";
+    public void setLocalhost(String localhost){
+        this.localhost = localhost;
+    }
+    public String getLocalhost(){
+        return  this.localhost;
+    }
+    private Map<Addr, ConnectionObject> coMap = new HashedMap();
+    private Map<Long, Addr> addrMap = new HashedMap();
+    public void addOtherAddr(Long id, Addr addr){
+        addrMap.put(id, addr);
+    }
+    public Addr getOtherAddr(Long id){
+        if(addrMap.containsKey(id)){
+            return addrMap.get(id);
+        }else{
+            return  null;
+        }
+    }
+    public void addOtherCO(Addr addr, ConnectionObject CO){
+        coMap.put(addr,CO);
+    }
+    public ConnectionObject getOtherCO(Addr addr){
+        if(coMap.containsKey(addr)){
+            return coMap.get(addr);
+        }else{
+            return null;
+        }
+    }
+    private Bootstrap b;
     private final long id ;
     public Client(long id){
         this.id = id;
     }
-    public void setPort(SocketAddress port){
-        this.myport = port;
+    public long getId(){
+        return this.id;
     }
+    public Client(long id, int listenPort){
+        this.id = id;
+        this.listenPort = listenPort;
+    }
+    public void setCoToServer(ConnectionObject co){
+        this.coToServer = co;
+    }
+    public ConnectionObject getCoToServer() {
+        return coToServer;
+    }
+    
     public void start(){
-        Thread t = new Thread(()->{
-            starClinet(host,port);
-        });
+        Thread t = new Thread(()-> startClient(serverAddress.getIp(),serverAddress.getPort()));
+        Thread t1 = new Thread(()-> startLitterServer());
         t.start();
+        t1.start();
     }
-    public Channel starClinet(String host, int port){
-        boolean isServer = (host.equals(this.host)&& port == this.port) ? true: false;
-        EventLoopGroup group = new NioEventLoopGroup();
+    public Channel startClient(String host, int port){
+        EventLoopGroup group = new NioEventLoopGroup(8);
         Channel ch = null;
         try {
             Bootstrap b = new Bootstrap();
-            ServerBootstrap bootstrap;
             b.group(group)
                     .channel(NioSocketChannel.class)
                     .handler(new ClientInitializer());
             b.option(ChannelOption.SO_KEEPALIVE,true);
-            // 连接服务端
-            ChannelFuture future = null;
+            b.option(ChannelOption.SO_REUSEADDR, true);
             this.b =b;
-            future = b.connect(host,port).sync();
-            if(isServer) {
-                bootstrap = new ServerBootstrap();
-                bootstrap.group(group);
-                bootstrap.channel(NioServerSocketChannel.class);
-                bootstrap.childHandler(new ClientInitializer());
-                bootstrap.bind(liport).sync();
-            }
+            ChannelFuture future  = b.connect(host,port).sync();
             if(future.isSuccess()){
                 ch = future.channel();
-                myport = ch.localAddress();
-                if(isServer) chToServer = ch;
+                InetSocketAddress  address = (InetSocketAddress)ch.localAddress();
+                myAddress  = new Addr(address.getHostString(),address.getPort());
+                UserMap.addAddr(myAddress,this);
+                chToServer =ch;
+                coToServer = new ConnectionObject();
+                coToServer.setChannel(ch);
+                reportPort();
             }
-           // MsgHandlerLoader.loadHandler();
-            if(isServer)
-            startping(chToServer);
+            startPing();
+            ch.closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace( );
         } finally {
             // The connection is closed automatically on shutdown.
-           // group.shutdownGracefully();
+            group.shutdownGracefully();
             return ch;
         }
         
     }
     
-    public Channel newLink(String Ip, int port){
-           Channel ch =  starClinet(Ip,8002);
-           return ch;
-    }
-    
-    public  ConnectionObject connet(String Ip, int port){
-        SocketAddress sa = new InetSocketAddress(Ip,8002);
-        Channel channel = null ;
+    public void startLitterServer(){
+        ServerBootstrap bootstrap;
+        EventLoopGroup group = new NioEventLoopGroup();
+        bootstrap = new ServerBootstrap();
+        bootstrap.group(group);
+        bootstrap.channel(NioServerSocketChannel.class);
+        bootstrap.childHandler(new ClientInitializer());
+        bootstrap.option(ChannelOption.SO_KEEPALIVE,true);
+        bootstrap.option(ChannelOption.SO_REUSEADDR, true);
         try {
-           channel = b.connect(sa).sync().channel();
+            ChannelFuture cf = bootstrap.bind(localhost,listenPort).sync();
+            UserMap.addAddr(new Addr(localhost,listenPort),this);
+            cf.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace( );
         }
-        ConnectionObject ob = new ConnectionObject();
-        ob.setChannel(channel);
-        return ob;
     }
     
-    public void startping(Channel ch){
-        coToServer = new ConnectionObject();
-        coToServer.setChannel(ch);
+    public  ConnectionObject connet(long id, String Ip, int port){
+        SocketAddress sa = new InetSocketAddress(Ip,port);
+        Channel channel = null ;
+        Addr addr = new Addr(Ip,port);
+        if(coMap.containsKey(addr)){
+             return coMap.get(addr);
+        }
+        try {
+            ChannelFuture future = b.connect(sa).sync();
+            
+            if(future.isSuccess()){
+                channel = future.channel();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace( );
+        }
+        ConnectionObject co = new ConnectionObject();
+        co.setChannel(channel);
+        CCPingMsg ccPingMsg = new CCPingMsg();
+        co.sendMessage(ccPingMsg);
+        coMap.put(addr,co);
+        addrMap.put(id, addr);
+        return co;
+    }
+    
+    public void startPing(){
         Runnable runnable = () -> {
             CSPingMsg msg = new CSPingMsg();
             msg.setCharId(id);
             coToServer.sendMessage(msg); // not sure that this object is already sent , cause main thread is shutdown
         };
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(runnable,0,1, TimeUnit.SECONDS);
+        service.scheduleAtFixedRate(runnable,0,5, TimeUnit.SECONDS);
     }
-
+    public void reportPort(){
+        CSPortReportMsg msg = new CSPortReportMsg(this.id,this.localhost,this.listenPort);
+        coToServer.sendMessage(msg);
+    }
+    public void setListenPort(int listenPort) {
+        this.listenPort = listenPort;
+    }
+    public int getListenPort(){
+        return this.listenPort;
+    }
 }
