@@ -50,7 +50,7 @@ public abstract class YandexTranslatorAPI {
 
   /**
    * Sets the referrer field.
-   * @param pKey The referrer.
+   * @param pReferrer The referrer.
    */
   public static void setReferrer(final String pReferrer) {
     referrer = pReferrer;
@@ -64,24 +64,29 @@ public abstract class YandexTranslatorAPI {
    * @throws Exception on error.
    */
   private static String retrieveResponse(final URL url) throws Exception {
-    final HttpsURLConnection uc = (HttpsURLConnection) url.openConnection();
-    if(referrer!=null)
-      uc.setRequestProperty("referer", referrer);
-    uc.setRequestProperty("Content-Type","text/plain; charset=" + ENCODING);
-    uc.setRequestProperty("Accept-Charset",ENCODING);
-    uc.setRequestMethod("GET");
-
-    try {
-      final int responseCode = uc.getResponseCode();
-      final String result = inputStreamToString(uc.getInputStream());
-      if(responseCode!=200) {
-        throw new Exception("Error from Yandex API: " + result);
-      }
-      return result;
-    } finally { 
+      final HttpsURLConnection uc = (HttpsURLConnection) url.openConnection( );
+      String res ="";
+      try {
+          uc.setConnectTimeout(1);
+          uc.setReadTimeout(1);
+          if (referrer != null)
+              uc.setRequestProperty("referer", referrer);
+          uc.setRequestProperty("Content-Type", "text/plain; charset=" + ENCODING);
+          uc.setRequestProperty("Accept-Charset", ENCODING);
+          uc.setRequestMethod("GET");
+          final int responseCode = uc.getResponseCode( );
+          res = inputStreamToString(uc.getInputStream( ));
+          if (responseCode != 200) {
+              throw new Exception("Error from Yandex API: " + res);
+          }
+          return res;
+      }catch (Exception e){
+          System.out.print(e);
+      } finally { 
       if(uc!=null) {
         uc.disconnect();
       }
+          return res;
     }
   }
 

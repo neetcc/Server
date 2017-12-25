@@ -10,7 +10,7 @@ public class ChatSer {
     private Client me;
     
     public void chatWithChar(long id , String content){
-        Address other = me.getOtherAddr(id);
+        MAddress other = me.getOtherAddr(id);
         if(other == null){
             return;
         }

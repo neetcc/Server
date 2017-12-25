@@ -5,18 +5,18 @@ import java.net.InetSocketAddress;
 /**
  * Created by ChengCe on 2017/12/18.
  */
-public class Address {
+public class MAddress {
     private int port;
     private String ip;
 
-    public Address(){
+    public MAddress(){
         
     }
-    public Address(InetSocketAddress address){
+    public MAddress(InetSocketAddress address){
         this.port = address.getPort();
         this.ip = address.getHostString();
     }
-    public Address(String ip, int port){
+    public MAddress(String ip, int port){
         this.ip = ip;
         this.port = port;
     }
@@ -38,8 +38,8 @@ public class Address {
     
     @Override
     public boolean equals(Object remoteAddr){
-        if(remoteAddr instanceof Address){
-            Address ra = (Address) remoteAddr;
+        if(remoteAddr instanceof MAddress){
+            MAddress ra = (MAddress) remoteAddr;
             return this.ip.equals(ra.ip) && this.port == ra.port ? true : false;
         }else{
             return false;
@@ -50,9 +50,9 @@ public class Address {
         return  this.ip.hashCode()+29*port;
     }
 /*    public static void main(String[] argv){
-        Map<Address , Address > map = new HashedMap();
-        map.put(new Address("127.0.0.1",1),new Address("127.0.0.1",1));
-        if(map.containsKey(new Address("127.0.0.1",1))){
+        Map<MAddress , MAddress > map = new HashedMap();
+        map.put(new MAddress("127.0.0.1",1),new MAddress("127.0.0.1",1));
+        if(map.containsKey(new MAddress("127.0.0.1",1))){
             System.out.println(1111);
         }
     }*/

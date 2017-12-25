@@ -16,9 +16,9 @@ public class CCChatMsgHandler extends AbstractMessageHandler<CCChatMsg,Sender> {
     protected void doExecute(CCChatMsg msg, Sender sender) {
         ConnectionObject player = ((ConnectionObject)sender);
         InetSocketAddress address = (InetSocketAddress) player.getChannel().localAddress();
-        //Address myAddr = new Address(address.getHostString(),address.getPort());
+        //MAddress myAddr = new MAddress(address.getHostString(),address.getPort());
         InetSocketAddress remoteAddress = (InetSocketAddress)player.getChannel().remoteAddress();
-        //Address reAddr = new Address(remoteAddress.getHostString(),remoteAddress.getPort());
+        //MAddress reAddr = new MAddress(remoteAddress.getHostString(),remoteAddress.getPort());
         System.out.println(address + "receive ccmsg from " + remoteAddress + "     : " + msg.getContent());
     }
 

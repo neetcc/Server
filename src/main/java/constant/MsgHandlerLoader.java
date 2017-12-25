@@ -4,17 +4,21 @@ import Handler.CC.CCChatMsgHandler;
 import Handler.CC.CCPingMsgHandler;
 import Handler.CS.CSLinkRequestMsgHandler;
 import Handler.CS.CSPortReportMsgHandler;
+import Handler.CS.CSRequestSerInfoHandler;
 import Handler.SC.SCLinkRequestMsgHandler;
 import Handler.SC.SCPingHandler;
+import Handler.SC.SCRequestSerInfoHandler;
 import msg.CC.CCChatMsg;
 import msg.CC.CCPingMsg;
 import msg.CS.CSLinkRequestMsg;
 import msg.CS.CSPingMsg;
 import Handler.CS.CSPingHandler;
 import msg.CS.CSPortReportMsg;
+import msg.CS.CSRequestSerInfo;
 import msg.IMessageHandler;
 import msg.SC.SCLinkRequestMsg;
 import msg.SC.SCPingMsg;
+import msg.SC.SCRequestSerInfo;
 import org.apache.thrift.TBase;
 
 import java.util.HashMap;
@@ -34,6 +38,8 @@ public class MsgHandlerLoader {
         messageMap.put(CSPortReportMsg.class, MsgConstant.CS_PORT_REPORT_MSG);
         messageMap.put(CCChatMsg.class,MsgConstant.CC_CHAT_MSG);
         messageMap.put(CCPingMsg.class,MsgConstant.CC_PING_MSG);
+        messageMap.put(CSRequestSerInfo.class, MsgConstant.CS_REQUEST_SERINFO);
+        messageMap.put(SCRequestSerInfo.class, MsgConstant.SC_REQUEST_SERINFO);
         
         
         handlerMap.put(MsgConstant.CS_PING_MSG,new CSPingHandler());
@@ -43,6 +49,8 @@ public class MsgHandlerLoader {
         handlerMap.put(MsgConstant.CS_PORT_REPORT_MSG, new CSPortReportMsgHandler());
         handlerMap.put(MsgConstant.CC_CHAT_MSG, new CCChatMsgHandler());
         handlerMap.put(MsgConstant.CC_PING_MSG, new CCPingMsgHandler());
+        handlerMap.put(MsgConstant.CS_REQUEST_SERINFO, new CSRequestSerInfoHandler());
+        handlerMap.put(MsgConstant.SC_REQUEST_SERINFO, new SCRequestSerInfoHandler());
     }
     
     public static int getMsgId(Class<? extends TBase> messageClass){

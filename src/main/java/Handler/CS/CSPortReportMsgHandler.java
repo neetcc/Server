@@ -1,7 +1,7 @@
 package Handler.CS;
 
 import Connection.Sender;
-import client.Address;
+import client.MAddress;
 import constant.MsgConstant;
 import msg.AbstractMessageHandler;
 import msg.CS.CSPortReportMsg;
@@ -14,7 +14,7 @@ public class CSPortReportMsgHandler extends AbstractMessageHandler<CSPortReportM
     @Override
     protected void doExecute(CSPortReportMsg msg, Sender sender) {
         
-        UserMap.addUserAddr(msg.getId(),new Address(msg.getIp(),msg.getMyListenPort()));
+        UserMap.addUserAddr(msg.getId(),new MAddress(msg.getIp(),msg.getMyListenPort()));
         System.out.println(msg.getId() + " report its listening port on : " + msg.getMyListenPort());
     }
 

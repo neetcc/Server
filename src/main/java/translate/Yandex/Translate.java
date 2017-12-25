@@ -63,7 +63,8 @@ public final class Translate extends YandexTranslatorAPI {
       System.out.println("Translation: " + translation);
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      System.out.println("can't translate");
+     // e.printStackTrace();
     }
   }
 }

@@ -1,6 +1,9 @@
 package client;
 
 import Connection.ConnectionObject;
+import TaskManagement.AbstractSimpleTask;
+import TaskManagement.DefaultTaskManager;
+import TaskManagement.ITask;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -28,54 +31,62 @@ import java.util.concurrent.TimeUnit;
  * Created by ChengCe on 2017/12/1.
  */
 public class Client {
-    private Address serverAddress = new Address(ServerConfig.IP, ServerConfig.PORT);
+    private MAddress serverMAddress = new MAddress(ServerConfig.IP, ServerConfig.PORT);
     
     private ConnectionObject coToServer; // the ConnectionObject with a channel connect to the server
     
-    private Address myAddress; // not contain the listen port
+    private MAddress myMAddress; // not contain the listen port
     
     private int listenPort; // listen port of the ServerBootstrap
+
+    private Bootstrap b; // bootstrap for client
+    
+    private final long id ;
     
     private String localhost = "127.0.0.1"; 
     
-    private Map<Address, ConnectionObject> coMap = new HashedMap(); // address ---- other co
+    private Map<MAddress, ConnectionObject> coMap = new HashedMap(); // address ---- other co
     
-    private Map<Long, Address> addrMap = new HashedMap(); // other id ---- other address
+    private Map<Long, MAddress> addrMap = new HashedMap(); // other id ---- other address
+
+    private DefaultTaskManager taskManager = ServerConfig.taskManager;
     
     public void setLocalhost(String localhost){
         this.localhost = localhost;
     }
+    
     public String getLocalhost(){
         return  this.localhost;
     }
-    public void addOtherAddr(Long id, Address address){
-        addrMap.put(id, address);
+    
+    public void addOtherAddr(Long id, MAddress MAddress){
+        addrMap.put(id, MAddress);
     }
-    public Address getOtherAddr(Long id){
+    public MAddress getOtherAddr(Long id){
         if(addrMap.containsKey(id)){
             return addrMap.get(id);
         }else{
             return  null;
         }
     }
-    public void addOtherCO(Address address, ConnectionObject CO){
-        coMap.put(address,CO);
+    
+    public void addOtherCO(MAddress MAddress, ConnectionObject CO){
+        coMap.put(MAddress,CO);
     }
-    public ConnectionObject getOtherCO(Address address){
-        if(coMap.containsKey(address)){
-            return coMap.get(address);
+    
+    public ConnectionObject getOtherCO(MAddress MAddress){
+        if(coMap.containsKey(MAddress)){
+            return coMap.get(MAddress);
         }else{
             return null;
         }
     }
-    private Bootstrap b;
-    private final long id ;
-    public Client(long id){
-        this.id = id;
-    }
+
+    
     public long getId(){
         return this.id;
     }
+    
     public Client(long id, int listenPort){
         this.id = id;
         this.listenPort = listenPort;
@@ -83,17 +94,48 @@ public class Client {
     public void setCoToServer(ConnectionObject co){
         this.coToServer = co;
     }
+    
     public ConnectionObject getCoToServer() {
         return coToServer;
     }
     
+    /*
+    * 
+    * */
     public void start(){
-        Thread t = new Thread(()-> startClient(serverAddress.getIp(),serverAddress.getPort()));
-        Thread t1 = new Thread(()-> startLitterServer());
-        t.start();
-        t1.start();
+       startClient();
+       startLittleServer();
     }
-    public Channel startClient(String host, int port){
+    
+    public void startClient(){
+        taskManager.executeITask(new AbstractSimpleTask( ) {
+            @Override
+            protected void execute() {
+                startClient(serverMAddress.getIp(),serverMAddress.getPort());
+            }
+
+            @Override
+            protected void callback() {
+                startPing();
+            }
+        });
+    }
+    
+    public void startLittleServer(){
+        taskManager.executeITask(new AbstractSimpleTask( ) {
+            @Override
+            protected void execute() {
+                startServer();
+            }
+
+            @Override
+            protected void callback() {
+                reportPort();
+            }
+        });
+    }
+    
+    public void startClient(String host, int port){
         EventLoopGroup group = new NioEventLoopGroup(8);
         Channel ch = null;
         try {
@@ -108,29 +150,24 @@ public class Client {
             if(future.isSuccess()){
                 ch = future.channel();
                 InetSocketAddress  address = (InetSocketAddress)ch.localAddress();
-                myAddress  = new Address(address.getHostString(),address.getPort());
-                UserMap.addAddr(myAddress,this);
+                myMAddress = new MAddress(address.getHostString(),address.getPort());
+                UserMap.addAddr(myMAddress,this);
                 coToServer = new ConnectionObject();
                 coToServer.setChannel(ch);
-                // report to the server my listen port
-                reportPort();
             }
-            startPing();
             ch.closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace( );
         } finally {
             // The connection is closed automatically on shutdown.
             group.shutdownGracefully();
-            return ch;
         }
         
     }
     
-    public void startLitterServer(){
-        ServerBootstrap bootstrap;
+    public void startServer(){
+        ServerBootstrap bootstrap = new ServerBootstrap();
         EventLoopGroup group = new NioEventLoopGroup();
-        bootstrap = new ServerBootstrap();
         bootstrap.group(group);
         bootstrap.channel(NioServerSocketChannel.class);
         bootstrap.childHandler(new ClientInitializer());
@@ -138,23 +175,23 @@ public class Client {
         bootstrap.option(ChannelOption.SO_REUSEADDR, true);
         try {
             ChannelFuture cf = bootstrap.bind(localhost,listenPort).sync();
-            UserMap.addAddr(new Address(localhost,listenPort),this);
+            UserMap.addAddr(new MAddress(localhost,listenPort),this);
+            // report to the server my listen port
             cf.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace( );
         }
     }
     
-    public  ConnectionObject connet(long id, String Ip, int port){
+    public  ConnectionObject connect(long id, String Ip, int port){
         SocketAddress sa = new InetSocketAddress(Ip,port);
         Channel channel = null ;
-        Address address = new Address(Ip,port);
-        if(coMap.containsKey(address)){
-             return coMap.get(address);
+        MAddress MAddress = new MAddress(Ip,port);
+        if(coMap.containsKey(MAddress)){
+             return coMap.get(MAddress);
         }
         try {
             ChannelFuture future = b.connect(sa).sync();
-            
             if(future.isSuccess()){
                 channel = future.channel();
             }
@@ -165,8 +202,8 @@ public class Client {
         co.setChannel(channel);
         CCPingMsg ccPingMsg = new CCPingMsg();
         co.sendMessage(ccPingMsg);
-        coMap.put(address,co);
-        addrMap.put(id, address);
+        coMap.put(MAddress,co);
+        addrMap.put(id, MAddress);
         return co;
     }
     

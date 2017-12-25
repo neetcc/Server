@@ -12,4 +12,6 @@ public class MsgConstant {
     public static final int CS_PORT_REPORT_MSG = 1004;
     public static final int CC_CHAT_MSG = 1005;
     public static final int CC_PING_MSG = 1006;
+    public static final int CS_REQUEST_SERINFO = 1007;
+    public static final int SC_REQUEST_SERINFO = 1008;
 }

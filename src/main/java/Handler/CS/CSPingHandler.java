@@ -4,15 +4,15 @@ import Connection.ConnectionObject;
 import Connection.Sender;
 import TaskManagement.AbstractSimpleTask;
 import TaskManagement.DefaultTaskManager;
-import client.Client;
 import constant.MsgConstant;
-import db.Entity.User;
 import db.Table.UserTable;
 import msg.AbstractMessageHandler;
 import msg.CS.CSPingMsg;
 import msg.SC.SCPingMsg;
 import server.ServerConfig;
 import server.UserMap;
+
+import java.net.InetSocketAddress;
 
 /**
  * Created by ChengCe on 2017/12/1.
@@ -28,8 +28,9 @@ public class CSPingHandler extends AbstractMessageHandler<CSPingMsg,Sender> {
         taskManager.executeITask(new AbstractSimpleTask( ) {
             @Override
             protected void execute() {
-                System.out.print("get ping msg from : ");
-                System.out.println(msg.getCharId());
+                InetSocketAddress local =(InetSocketAddress) ((ConnectionObject)sender).getChannel().localAddress();
+                InetSocketAddress remote =(InetSocketAddress) ((ConnectionObject)sender).getChannel().remoteAddress();
+                System.out.println(local + "get ping msg from : id: "+msg.getCharId() + " : " + remote);
                 //ut.insert(new User(msg.getCharId(),String.valueOf(msg.getCharId())));
                 ConnectionObject CO = (ConnectionObject) sender;
                 SCPingMsg msgss = new SCPingMsg();
